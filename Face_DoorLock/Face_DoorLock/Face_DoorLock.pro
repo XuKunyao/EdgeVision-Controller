@@ -16,14 +16,28 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 # 添加OpenCV和SeetaFace的头文件路径
-INCLUDEPATH += "E:/Program/Linux/Linux_Projects/ARM-DoorLock-Project/OpenCV_install/include"
-INCLUDEPATH += "E:/Program/Linux/Linux_Projects/ARM-DoorLock-Project/OpenCV_install/include/opencv2"
-INCLUDEPATH += "E:/Program/Linux/Linux_Projects/ARM-DoorLock-Project/SeetaFace_install/include/seeta"
-INCLUDEPATH += "E:/Program/Linux/Linux_Projects/ARM-DoorLock-Project/SeetaFace_install/include"
+INCLUDEPATH += "/home/xukunyao/work/DoorLockSystem/OpenCV_install/include"
+INCLUDEPATH += "/home/xukunyao/work/DoorLockSystem/OpenCV_install/include/opencv2"
+INCLUDEPATH += "/home/xukunyao/work/DoorLockSystem/SeetaFace_install/include/seeta"
+INCLUDEPATH += "/home/xukunyao/work/DoorLockSystem/SeetaFace_install/include"
 
 # 添加OpenCV和SeetaFace的库文件路径
-LIBS += "E:\Program\Linux\Linux_Projects\ARM-DoorLock-Project\OpenCV_install\x64\mingw\lib\libopencv*"
-LIBS += "E:\Program\Linux\Linux_Projects\ARM-DoorLock-Project\SeetaFace_install\lib\lib*"
+LIBS += -L"/home/xukunyao/work/DoorLockSystem/OpenCV_install/x64/mingw/lib" \
+        -lopencv_core452 \
+        -lopencv_highgui452 \
+        -lopencv_imgproc452 \
+        -lopencv_imgcodecs452 \
+        -lopencv_videoio452 \
+        -lopencv_face452 \
+        -lopencv_objdetect452
+
+LIBS += -L"/home/xukunyao/work/DoorLockSystem/SeetaFace_install/lib" \
+        -lSeetaFaceDetector \
+        -lSeetaFaceLandmarker \
+        -lSeetaFaceRecognizer \
+        -lSeetaFaceTracker \
+        -lSeetaNet \
+        -lSeetaQualityAssessor
 
 SOURCES += \
     ../../Face_Server/Face_Server/qfaceobject.cpp \
