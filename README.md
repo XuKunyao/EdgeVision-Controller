@@ -1,3 +1,29 @@
+## VSCode 开发环境配置
+
+**是的！这个项目现在可以在 VSCode 中运行了。**
+
+详细的 VSCode 配置指南请参阅：[VSCODE_SETUP.md](VSCODE_SETUP.md)
+
+### 快速开始（VSCode）
+
+1. 安装必需的开发工具：
+```bash
+sudo apt install -y qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools build-essential
+sudo apt install -y libopencv-dev libopencv-contrib-dev
+```
+
+2. 在 VSCode 中打开项目
+3. 安装推荐的扩展（会自动提示）
+4. 使用 `Ctrl+Shift+P` → "Tasks: Run Build Task" 构建项目
+5. 运行演示版本：`./Face_Server/Face_Server/Face_Server_demo`
+
+### 项目状态
+- ✅ Qt5 + OpenCV4：完全兼容并可在 Linux 上编译
+- ✅ VSCode 配置：包含完整的 IntelliSense 和构建任务
+- ⚠️ SeetaFace2：需要为 Linux 重新编译（当前仅有演示版本）
+
+---
+
 # IntelligentDoorLockSystem_BasedOn_ARM-AI
 基于韦东山Imx6ull-pro开发板和OpenCV4.5.2和SeetaFace2
 **技术栈：Linux设备驱动、Platform总线、TCP数据(socket)、OpenCV使用、人脸识别算法应用、多线程、QT设计**

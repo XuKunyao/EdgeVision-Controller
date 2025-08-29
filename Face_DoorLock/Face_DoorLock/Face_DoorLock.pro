@@ -15,14 +15,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-# 添加OpenCV和SeetaFace的头文件路径
-INCLUDEPATH += "/home/xukunyao/work/DoorLockSystem/OpenCV_install/include"
-INCLUDEPATH += "/home/xukunyao/work/DoorLockSystem/OpenCV_install/include/opencv2"
-INCLUDEPATH += "/home/xukunyao/work/DoorLockSystem/SeetaFace_install/include/seeta"
-INCLUDEPATH += "/home/xukunyao/work/DoorLockSystem/SeetaFace_install/include"
+# 添加OpenCV和SeetaFace的头文件路径 (使用相对路径)
+INCLUDEPATH += "../../OpenCV_install/include"
+INCLUDEPATH += "../../OpenCV_install/include/opencv2"
+INCLUDEPATH += "../../SeetaFace_install/include/seeta"
+INCLUDEPATH += "../../SeetaFace_install/include"
 
-# 添加OpenCV和SeetaFace的库文件路径
-LIBS += -L"/home/xukunyao/work/DoorLockSystem/OpenCV_install/x64/mingw/lib" \
+# 添加OpenCV和SeetaFace的库文件路径 (使用相对路径)
+LIBS += -L"../../OpenCV_install/x64/mingw/lib" \
         -lopencv_core452 \
         -lopencv_highgui452 \
         -lopencv_imgproc452 \
@@ -31,7 +31,7 @@ LIBS += -L"/home/xukunyao/work/DoorLockSystem/OpenCV_install/x64/mingw/lib" \
         -lopencv_face452 \
         -lopencv_objdetect452
 
-LIBS += -L"/home/xukunyao/work/DoorLockSystem/SeetaFace_install/lib" \
+LIBS += -L"../../SeetaFace_install/lib" \
         -lSeetaFaceDetector \
         -lSeetaFaceLandmarker \
         -lSeetaFaceRecognizer \

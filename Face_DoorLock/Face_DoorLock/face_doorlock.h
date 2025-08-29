@@ -2,7 +2,7 @@
 #define FACE_DOORLOCK_H
 
 #include <QMainWindow>
-#include <opencv.hpp> //包含opencv头文件
+#include <opencv2/opencv.hpp> //包含opencv头文件
 #include <QTcpSocket>
 #include <QTimer>
 

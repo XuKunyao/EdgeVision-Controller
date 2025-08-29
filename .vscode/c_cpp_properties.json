@@ -1,0 +1,36 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/OpenCV_install/include",
+                "${workspaceFolder}/OpenCV_install/include/opencv2",
+                "${workspaceFolder}/SeetaFace_install/include",
+                "${workspaceFolder}/SeetaFace_install/include/seeta",
+                "${workspaceFolder}/Face_Server/Face_Server",
+                "${workspaceFolder}/Face_DoorLock/Face_DoorLock",
+                "/usr/include/x86_64-linux-gnu/qt5",
+                "/usr/include/x86_64-linux-gnu/qt5/QtCore",
+                "/usr/include/x86_64-linux-gnu/qt5/QtGui",
+                "/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
+                "/usr/include/x86_64-linux-gnu/qt5/QtNetwork",
+                "/usr/include/x86_64-linux-gnu/qt5/QtSql"
+            ],
+            "defines": [
+                "QT_CORE_LIB",
+                "QT_GUI_LIB",
+                "QT_WIDGETS_LIB",
+                "QT_NETWORK_LIB",
+                "QT_SQL_LIB",
+                "QT_DEPRECATED_WARNINGS"
+            ],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c17",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "linux-gcc-x64",
+            "configurationProvider": "ms-vscode.cmake-tools"
+        }
+    ],
+    "version": 4
+}

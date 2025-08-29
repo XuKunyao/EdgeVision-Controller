@@ -1,0 +1,156 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Face_Server (Demo)",
+            "type": "shell",
+            "command": "qmake",
+            "args": [
+                "Face_Server_demo.pro"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/Face_Server/Face_Server"
+            },
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Make Face_Server (Demo)",
+            "type": "shell",
+            "command": "make",
+            "options": {
+                "cwd": "${workspaceFolder}/Face_Server/Face_Server"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": "Build Face_Server (Demo)",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Build Face_DoorLock",
+            "type": "shell",
+            "command": "qmake",
+            "args": [
+                "Face_DoorLock.pro"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/Face_DoorLock/Face_DoorLock"
+            },
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Make Face_DoorLock",
+            "type": "shell",
+            "command": "make",
+            "options": {
+                "cwd": "${workspaceFolder}/Face_DoorLock/Face_DoorLock"
+            },
+            "group": "build",
+            "dependsOn": "Build Face_DoorLock",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Clean Face_Server",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "clean"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/Face_Server/Face_Server"
+            },
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Clean Face_DoorLock",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "clean"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/Face_DoorLock/Face_DoorLock"
+            },
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Face_Server",
+            "type": "shell",
+            "command": "./Face_Server",
+            "options": {
+                "cwd": "${workspaceFolder}/Face_Server/Face_Server"
+            },
+            "group": "test",
+            "dependsOn": "Make Face_Server",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Face_DoorLock",
+            "type": "shell",
+            "command": "./Face_DoorLock",
+            "options": {
+                "cwd": "${workspaceFolder}/Face_DoorLock/Face_DoorLock"
+            },
+            "group": "test",
+            "dependsOn": "Make Face_DoorLock",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        }
+    ]
+}

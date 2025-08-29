@@ -1,0 +1,48 @@
+# Build artifacts
+Makefile
+*.o
+moc_*.cpp
+ui_*.h
+moc_predefs.h
+.qmake.stash
+
+# Executables
+Face_Server
+Face_Server_linux
+Face_Server_demo
+Face_DoorLock
+Face_DoorLock_linux
+Face_DoorLock_demo
+
+# Qt temporary files
+*.pro.user
+*.pro.user.*
+
+# Build directories
+build-*/
+debug/
+release/
+
+# Database files
+*.db
+
+# VSCode settings (keep the configuration but ignore workspace-specific)
+.vscode/settings.json
+.vscode/launch.json
+
+# Temporary files
+*~
+*.tmp
+*.temp
+
+# Log files
+*.log
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+
+# SeetaFace models (if downloaded)
+models/
+*.dat

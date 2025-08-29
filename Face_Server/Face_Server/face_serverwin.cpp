@@ -2,7 +2,7 @@
 #include "ui_face_serverwin.h"
 #include <QDateTime>
 #include <QThread>
-#include <opencv.hpp>
+#include <opencv2/opencv.hpp>
 #include <QSqlQuery>
 #include <QSqlRecord>
 

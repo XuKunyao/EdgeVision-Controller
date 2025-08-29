@@ -2,8 +2,10 @@
 #define QFACEOBJECT_H
 
 #include <QObject>
+#ifndef DISABLE_SEETAFACE
 #include <seeta/FaceEngine.h>
-#include <opencv.hpp>
+#endif
+#include <opencv2/opencv.hpp>
 
 //人脸数据存储， 人脸检测，人脸识别
 class QFaceObject : public QObject
@@ -20,9 +22,10 @@ public slots:
 signals:
     void send_faceid(int64_t faceid);
 private:
+#ifndef DISABLE_SEETAFACE
     // SeetaFace 引擎指针
     seeta::FaceEngine  *fengineptr;
-
+#endif
 };
 
 #endif // QFACEOBJECT_H

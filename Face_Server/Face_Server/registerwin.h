@@ -2,7 +2,7 @@
 #define REGISTERWIN_H
 
 #include <QWidget>
-#include <opencv.hpp> //包含opencv头文件
+#include <opencv2/opencv.hpp> //包含opencv头文件
 
 namespace Ui {
 class RegisterWin;

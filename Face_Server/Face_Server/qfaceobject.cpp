@@ -3,6 +3,7 @@
 
 QFaceObject::QFaceObject(QObject *parent) : QObject(parent)
 {
+#ifndef DISABLE_SEETAFACE
     // 初始化 SeetaFace 模型路径和计算设备
     // 加载人脸检测（FD）、关键点检测（PD）和特征提取（FR）模型
     seeta::ModelSetting  FDmode("E:/Program/Linux/Linux_Projects/ARM-DoorLock-Project/SeetaFace_install/bin/model/fd_2_00.dat",seeta::ModelSetting::CPU,0);
@@ -13,16 +14,21 @@ QFaceObject::QFaceObject(QObject *parent) : QObject(parent)
 
     // 导入已有的人脸数据库
     this->fengineptr->Load("./face.db");
+#else
+    qDebug() << "SeetaFace is disabled for this build. Face recognition features are not available.";
+#endif
 }
 
 QFaceObject::~QFaceObject()
 {
+#ifndef DISABLE_SEETAFACE
     delete fengineptr;
+#endif
 }
 
 int64_t QFaceObject::face_register(cv::Mat &faceImage)
 {
-
+#ifndef DISABLE_SEETAFACE
     //把opencv的Mat数据转为seetaface的数据
     SeetaImageData simage;
     simage.data = faceImage.data;
@@ -38,10 +44,16 @@ int64_t QFaceObject::face_register(cv::Mat &faceImage)
         fengineptr->Save("./face.db");
     }
     return faceid;
+#else
+    Q_UNUSED(faceImage)
+    qDebug() << "Face registration is disabled (SeetaFace not available)";
+    return -1;
+#endif
 }
 
 int QFaceObject::face_query(cv::Mat &faceImage)
 {
+#ifndef DISABLE_SEETAFACE
     //把opencv的Mat数据转为seetaface的数据
     SeetaImageData simage;
     simage.data = faceImage.data;
@@ -62,6 +74,12 @@ int QFaceObject::face_query(cv::Mat &faceImage)
         emit send_faceid(-1);
     }
     return faceid;
+#else
+    Q_UNUSED(faceImage)
+    qDebug() << "Face query is disabled (SeetaFace not available)";
+    emit send_faceid(-1);
+    return -1;
+#endif
 }
 
 

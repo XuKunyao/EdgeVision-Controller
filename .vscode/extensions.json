@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cmake-tools",
+        "seanwu.vscode-qt-for-python",
+        "twxs.cmake",
+        "ms-vscode.cpptools-extension-pack"
+    ]
+}
