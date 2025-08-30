@@ -30,15 +30,13 @@ SOURCES += \
     face_serverwin.cpp \
     qfaceobject.cpp \
     registerwin.cpp \
-    selectwin.cpp \
-    databasemanager.cpp
+    selectwin.cpp
 
 HEADERS += \
     face_serverwin.h \
     qfaceobject.h \
     registerwin.h \
-    selectwin.h \
-    databasemanager.h
+    selectwin.h
 
 FORMS += \
     face_serverwin.ui \
