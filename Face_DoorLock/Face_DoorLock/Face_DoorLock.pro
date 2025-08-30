@@ -4,6 +4,11 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
 
+# 添加Protobuf支持
+CONFIG += link_pkgconfig
+PKGCONFIG += protobuf
+INCLUDEPATH += ../..
+
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -28,11 +33,15 @@ LIBS += "E:\Program\Linux\Linux_Projects\ARM-DoorLock-Project\SeetaFace_install\
 SOURCES += \
     ../../Face_Server/Face_Server/qfaceobject.cpp \
     main.cpp \
-    face_doorlock.cpp
+    face_doorlock.cpp \
+    ../../proto/door_lock_messages.pb.cc \
+    ../../proto/protobuf_helper.cpp
 
 HEADERS += \
     ../../Face_Server/Face_Server/qfaceobject.h \
-    face_doorlock.h
+    face_doorlock.h \
+    ../../proto/door_lock_messages.pb.h \
+    ../../proto/protobuf_helper.h
 
 FORMS += \
     face_doorlock.ui

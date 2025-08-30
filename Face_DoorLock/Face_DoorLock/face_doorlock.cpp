@@ -6,6 +6,9 @@
 #include <QJsonParseError>
 #include <qjsondocument.h>
 #include <QJsonObject>
+#include "../../proto/protobuf_helper.h"
+
+using namespace door_lock;
 
 Face_DoorLock::Face_DoorLock(QWidget *parent)
     : QMainWindow(parent)
@@ -68,19 +71,24 @@ void Face_DoorLock::timerEvent(QTimerEvent *e)
         ui->head_2->move(rect.x,rect.y);
 
         if(flag > 2){
-            //把Mat数据转化为QbyteArray， -->编码成jpg格式
-            std::vector<uchar> buf;
-            cv::imencode(".jpg",srcImage,buf);
-            QByteArray byte((const char*)buf.data(),buf.size());
-            //准备发送
-            quint64 backsize = byte.size();
+            // 保存人脸数据
+            faceMat = srcImage(rect);
+            
+            // 创建Protobuf消息
+            DoorLockMessage message = ProtobufHelper::createImageMessage(srcImage, "door_001");
+            QByteArray protobufData = ProtobufHelper::serializeMessage(message);
+            
+            // 发送Protobuf数据（保持与原协议兼容的包格式）
+            quint64 protobufSize = protobufData.size();
             QByteArray sendData;
-            QDataStream stream(&sendData,QIODevice::WriteOnly);
+            QDataStream stream(&sendData, QIODevice::WriteOnly);
             stream.setVersion(QDataStream::Qt_5_14);
-            stream<<backsize<<byte;
-            //发送
+            stream << protobufSize << protobufData;
             msocket.write(sendData);
+            
             flag = -2;
+            
+            qDebug() << "Sent protobuf image data, size:" << protobufSize;
 
             //保存人脸数据
             faceMat = srcImage(rect);
@@ -114,32 +122,71 @@ void Face_DoorLock::timer_connect()
 
 void Face_DoorLock::recv_data()
 {
-    // QString msg = msocket.readAll();
-    // qDebug()<<msg;
-    // ui->nameEdit->setText(msg);
-
-    //{employeeID:%1,name:%2,department:软件,time:%3}
     QByteArray array = msocket.readAll();
-    qDebug()<<array;
-    //Json解析
-    QJsonParseError err;
-    QJsonDocument doc = QJsonDocument::fromJson(array,&err);
-    if(err.error != QJsonParseError::NoError)
-    {
-        qDebug()<<"json数据错误";
-        return;
+    qDebug() << "Received data size:" << array.size();
+    
+    // 尝试解析Protobuf消息
+    DoorLockMessage message;
+    if (ProtobufHelper::deserializeMessage(array, message)) {
+        // 使用Protobuf协议
+        if (message.type() == DoorLockMessage::RECOGNITION_RESULT) {
+            const RecognitionResult& result = message.recognition_result();
+            
+            if (result.status() == RecognitionResult::SUCCESS) {
+                const PersonInfo& person = result.person();
+                
+                // 更新UI
+                ui->personnelEdit->setText(QString::fromStdString(person.personnel_id()));
+                ui->nameEdit->setText(QString::fromStdString(person.name()));
+                ui->departmentEdit->setText(QString::fromStdString(person.department()));
+                ui->timeEdit->setText(QString::fromStdString(result.timestamp()));
+                
+                // 显示头像和认证成功标签
+                ui->head->setStyleSheet("border-radius:75px;border-image: url(./face.jpg);");
+                ui->renzhenglb->show();
+                
+                qDebug() << "Protobuf recognition success:" << QString::fromStdString(person.name())
+                         << "Confidence:" << result.confidence();
+            } else {
+                qDebug() << "Protobuf recognition failed:" << QString::fromStdString(result.message());
+                // 清空UI显示
+                ui->personnelEdit->clear();
+                ui->nameEdit->clear();
+                ui->departmentEdit->clear();
+                ui->timeEdit->clear();
+                ui->renzhenglb->hide();
+            }
+        }
+    } else {
+        // 使用原有的JSON协议（向后兼容）
+        QJsonParseError err;
+        QJsonDocument doc = QJsonDocument::fromJson(array, &err);
+        if(err.error != QJsonParseError::NoError) {
+            qDebug() << "JSON parse error";
+            return;
+        }
+
+        QJsonObject obj = doc.object();
+        QString personnelID = obj.value("personnelID").toString();
+        QString name = obj.value("name").toString();
+        QString department = obj.value("department").toString();
+        QString timestr = obj.value("time").toString();
+
+        ui->personnelEdit->setText(personnelID);
+        ui->nameEdit->setText(name);
+        ui->departmentEdit->setText(department);
+        ui->timeEdit->setText(timestr);
+        
+        // 显示头像和认证成功标签（如果识别成功）
+        if (!name.isEmpty()) {
+            ui->head->setStyleSheet("border-radius:75px;border-image: url(./face.jpg);");
+            ui->renzhenglb->show();
+            qDebug() << "JSON recognition success:" << name;
+        } else {
+            ui->renzhenglb->hide();
+            qDebug() << "JSON recognition failed";
+        }
     }
-
-    QJsonObject obj = doc.object();
-    QString personnelID = obj.value("personnelID").toString();
-    QString name = obj.value("name").toString();
-    QString department = obj.value("department").toString();
-    QString timestr = obj.value("time").toString();
-
-    ui->personnelEdit->setText(personnelID);
-    ui->nameEdit->setText(name);
-    ui->departmentEdit->setText(department);
-    ui->timeEdit->setText(timestr);
 
     //读取对应的图片文件，通过样式来显示图片
     ui->head->setStyleSheet("border-radius:75px;border-image: url(./face.jpg);");

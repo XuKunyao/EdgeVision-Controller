@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package door_lock;
+
+// 图像数据消息（客户端→服务器）
+message ImageData {
+    bytes image_data = 1;           // JPG格式的图像二进制数据
+    string format = 2;              // 图像格式（"jpg", "png"等）
+    int64 timestamp = 3;            // 捕获时间戳
+    string device_id = 4;           // 设备ID（用于多设备管理）
+    int32 image_width = 5;          // 图像宽度
+    int32 image_height = 6;         // 图像高度
+}
+
+// 人员信息
+message PersonInfo {
+    string personnel_id = 1;        // 人员ID
+    string name = 2;                // 姓名
+    string department = 3;          // 部门
+    string phone = 4;               // 电话
+    string address = 5;             // 地址
+    int64 face_id = 6;              // 人脸ID（关联face.db）
+}
+
+// 识别结果消息（服务器→客户端）
+message RecognitionResult {
+    enum Status {
+        SUCCESS = 0;                // 识别成功
+        FAILED = 1;                 // 识别失败
+        NO_FACE = 2;                // 未检测到人脸
+        LOW_QUALITY = 3;            // 图像质量过低
+        DATABASE_ERROR = 4;         // 数据库错误
+    }
+    
+    Status status = 1;              // 识别状态
+    PersonInfo person = 2;          // 人员信息（成功时）
+    string message = 3;             // 状态描述
+    string timestamp = 4;           // 识别时间
+    float confidence = 5;           // 识别置信度（0.0-1.0）
+    int64 face_id = 6;              // 匹配的人脸ID
+}
+
+// 控制命令消息（双向）
+message ControlCommand {
+    enum CommandType {
+        HEARTBEAT = 0;              // 心跳包
+        START_RECOGNITION = 1;      // 开始识别
+        STOP_RECOGNITION = 2;       // 停止识别
+        REBOOT_DEVICE = 3;          // 重启设备
+        UPDATE_CONFIG = 4;          // 更新配置
+    }
+    
+    CommandType type = 1;           // 命令类型
+    string payload = 2;             // 命令参数（JSON格式）
+    int64 timestamp = 3;            // 命令时间戳
+}
+
+// 设备状态消息
+message DeviceStatus {
+    string device_id = 1;           // 设备ID
+    bool is_online = 2;             // 在线状态
+    int32 cpu_usage = 3;            // CPU使用率（百分比）
+    int32 memory_usage = 4;         // 内存使用率（百分比）
+    int32 camera_status = 5;        // 摄像头状态（0=正常，1=异常）
+    string version = 6;             // 软件版本
+    int64 uptime = 7;               // 运行时间（秒）
+}
+
+// 通用消息容器
+message DoorLockMessage {
+    enum MessageType {
+        IMAGE_DATA = 0;
+        RECOGNITION_RESULT = 1;
+        CONTROL_COMMAND = 2;
+        DEVICE_STATUS = 3;
+    }
+    
+    MessageType type = 1;           // 消息类型
+    
+    // 使用oneof确保只有一个消息类型被设置
+    oneof payload {
+        ImageData image_data = 2;
+        RecognitionResult recognition_result = 3;
+        ControlCommand control_command = 4;
+        DeviceStatus device_status = 5;
+    }
+}

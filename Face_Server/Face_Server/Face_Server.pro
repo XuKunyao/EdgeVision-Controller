@@ -4,6 +4,11 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
 
+# 添加Protobuf支持
+CONFIG += link_pkgconfig
+PKGCONFIG += protobuf
+INCLUDEPATH += ../..
+
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -31,14 +36,18 @@ SOURCES += \
     qfaceobject.cpp \
     registerwin.cpp \
     selectwin.cpp \
-    databasemanager.cpp
+    databasemanager.cpp \
+    ../../proto/door_lock_messages.pb.cc \
+    ../../proto/protobuf_helper.cpp
 
 HEADERS += \
     face_serverwin.h \
     qfaceobject.h \
     registerwin.h \
     selectwin.h \
-    databasemanager.h
+    databasemanager.h \
+    ../../proto/door_lock_messages.pb.h \
+    ../../proto/protobuf_helper.h
 
 FORMS += \
     face_serverwin.ui \
