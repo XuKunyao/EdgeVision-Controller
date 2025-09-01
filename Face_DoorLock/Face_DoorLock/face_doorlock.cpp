@@ -74,9 +74,9 @@ void Face_DoorLock::timerEvent(QTimerEvent *e)
             // 保存人脸数据
             faceMat = srcImage(rect);
             
-            // 创建Protobuf消息
-            DoorLockMessage message = ProtobufHelper::createImageMessage(srcImage, "door_001");
-            QByteArray protobufData = ProtobufHelper::serializeMessage(message);
+            // 创建Protobuf图像消息（精简版）
+            ImageMessage imageMsg = ProtobufHelper::createImageMessage(srcImage);
+            QByteArray protobufData = ProtobufHelper::serializeImageMessage(imageMsg);
             
             // 发送Protobuf数据（保持与原协议兼容的包格式）
             quint64 protobufSize = protobufData.size();
@@ -125,37 +125,30 @@ void Face_DoorLock::recv_data()
     QByteArray array = msocket.readAll();
     qDebug() << "Received data size:" << array.size();
     
-    // 尝试解析Protobuf消息
-    DoorLockMessage message;
-    if (ProtobufHelper::deserializeMessage(array, message)) {
+    // 尝试解析Protobuf消息（精简版）
+    ResultMessage result;
+    if (ProtobufHelper::deserializeResultMessage(array, result)) {
         // 使用Protobuf协议
-        if (message.type() == DoorLockMessage::RECOGNITION_RESULT) {
-            const RecognitionResult& result = message.recognition_result();
+        if (result.success()) {
+            // 更新UI
+            ui->personnelEdit->setText(QString::fromStdString(result.personnel_id()));
+            ui->nameEdit->setText(QString::fromStdString(result.name()));
+            ui->departmentEdit->setText(QString::fromStdString(result.department()));
+            ui->timeEdit->setText(QString::fromStdString(result.timestamp()));
             
-            if (result.status() == RecognitionResult::SUCCESS) {
-                const PersonInfo& person = result.person();
-                
-                // 更新UI
-                ui->personnelEdit->setText(QString::fromStdString(person.personnel_id()));
-                ui->nameEdit->setText(QString::fromStdString(person.name()));
-                ui->departmentEdit->setText(QString::fromStdString(person.department()));
-                ui->timeEdit->setText(QString::fromStdString(result.timestamp()));
-                
-                // 显示头像和认证成功标签
-                ui->head->setStyleSheet("border-radius:75px;border-image: url(./face.jpg);");
-                ui->renzhenglb->show();
-                
-                qDebug() << "Protobuf recognition success:" << QString::fromStdString(person.name())
-                         << "Confidence:" << result.confidence();
-            } else {
-                qDebug() << "Protobuf recognition failed:" << QString::fromStdString(result.message());
-                // 清空UI显示
-                ui->personnelEdit->clear();
-                ui->nameEdit->clear();
-                ui->departmentEdit->clear();
-                ui->timeEdit->clear();
-                ui->renzhenglb->hide();
-            }
+            // 显示头像和认证成功标签
+            ui->head->setStyleSheet("border-radius:75px;border-image: url(./face.jpg);");
+            ui->renzhenglb->show();
+            
+            qDebug() << "Protobuf recognition success:" << QString::fromStdString(result.name());
+        } else {
+            qDebug() << "Protobuf recognition failed";
+            // 清空UI显示
+            ui->personnelEdit->clear();
+            ui->nameEdit->clear();
+            ui->departmentEdit->clear();
+            ui->timeEdit->clear();
+            ui->renzhenglb->hide();
         }
     } else {
         // 使用原有的JSON协议（向后兼容）
@@ -189,8 +182,8 @@ void Face_DoorLock::recv_data()
     }
 
     //读取对应的图片文件，通过样式来显示图片
-    ui->head->setStyleSheet("border-radius:75px;border-image: url(./face.jpg);");
-    ui->renzhenglb->show();
+    // ui->head->setStyleSheet("border-radius:75px;border-image: url(./face.jpg);");
+    // ui->renzhenglb->show();
 }
 
 void Face_DoorLock::stop_connect()

@@ -2,24 +2,76 @@
 #include <vector>
 #include <QDebug>
 
-DoorLockMessage ProtobufHelper::createImageMessage(const cv::Mat& image, const QString& deviceId)
+#include "protobuf_helper.h"
+#include <QDateTime>
+#include <QDebug>
+#include <vector>
+
+// 创建图像消息
+ImageMessage ProtobufHelper::createImageMessage(const cv::Mat& image)
 {
-    DoorLockMessage message;
-    message.set_type(DoorLockMessage::IMAGE_DATA);
+    ImageMessage msg;
     
-    ImageData* imageData = message.mutable_image_data();
+    // 将OpenCV Mat编码为JPG格式
+    std::vector<uchar> buffer;
+    cv::imencode(".jpg", image, buffer);
     
-    // 将cv::Mat编码为JPG格式
-    QByteArray imageBytes = matToByteArray(image, "jpg");
+    // 转换为QByteArray再转换为std::string
+    QByteArray imageData(reinterpret_cast<const char*>(buffer.data()), buffer.size());
+    msg.set_image_data(imageData.toStdString());
     
-    imageData->set_image_data(imageBytes.data(), imageBytes.size());
-    imageData->set_format("jpg");
-    imageData->set_timestamp(QDateTime::currentMSecsSinceEpoch());
-    imageData->set_device_id(deviceId.toStdString());
-    imageData->set_image_width(image.cols);
-    imageData->set_image_height(image.rows);
+    return msg;
+}
+
+// 创建识别结果消息
+ResultMessage ProtobufHelper::createResultMessage(bool success, 
+                                                 const QString& personnelId,
+                                                 const QString& name,
+                                                 const QString& department,
+                                                 const QString& timestamp)
+{
+    ResultMessage msg;
     
-    return message;
+    msg.set_success(success);
+    
+    if (success) {
+        msg.set_personnel_id(personnelId.toStdString());
+        msg.set_name(name.toStdString());
+        msg.set_department(department.toStdString());
+    }
+    
+    QString timeStr = timestamp.isEmpty() ? 
+                     QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") : 
+                     timestamp;
+    msg.set_timestamp(timeStr.toStdString());
+    
+    return msg;
+}
+
+// 序列化图像消息
+QByteArray ProtobufHelper::serializeImageMessage(const ImageMessage& message)
+{
+    std::string serialized = message.SerializeAsString();
+    return QByteArray(serialized.c_str(), serialized.size());
+}
+
+// 序列化结果消息
+QByteArray ProtobufHelper::serializeResultMessage(const ResultMessage& message)
+{
+    std::string serialized = message.SerializeAsString();
+    return QByteArray(serialized.c_str(), serialized.size());
+}
+
+// 反序列化图像消息
+bool ProtobufHelper::deserializeImageMessage(const QByteArray& data, ImageMessage& message)
+{
+    return message.ParseFromArray(data.constData(), data.size());
+}
+
+// 反序列化结果消息
+bool ProtobufHelper::deserializeResultMessage(const QByteArray& data, ResultMessage& message)
+{
+    return message.ParseFromArray(data.constData(), data.size());
 }
 
 DoorLockMessage ProtobufHelper::createRecognitionResult(

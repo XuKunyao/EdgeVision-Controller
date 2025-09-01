@@ -89,29 +89,27 @@ void Face_ServerWin::read_data()
         return;
     }
 
-    // 尝试解析Protobuf消息
-    DoorLockMessage message;
-    if (ProtobufHelper::deserializeMessage(data, message)) {
+    // 尝试解析Protobuf消息（精简版）
+    ImageMessage imageMsg;
+    if (ProtobufHelper::deserializeImageMessage(data, imageMsg)) {
         // 使用Protobuf协议
-        if (message.type() == DoorLockMessage::IMAGE_DATA) {
-            const ImageData& imageData = message.image_data();
-            
-            // 转换为cv::Mat
-            QByteArray imageBytes(imageData.image_data().data(), imageData.image_data().size());
-            cv::Mat faceImage = ProtobufHelper::byteArrayToMat(imageBytes);
-            
-            // 在UI显示图像
-            QPixmap mmp;
-            mmp.loadFromData(imageBytes, imageData.format().c_str());
-            mmp = mmp.scaled(ui->picture->size());
-            ui->picture->setPixmap(mmp);
-            
-            qDebug() << "Received protobuf image from device:" << QString::fromStdString(imageData.device_id())
-                     << "Size:" << imageData.image_width() << "x" << imageData.image_height();
-            
-            // 触发人脸识别
-            emit query(faceImage);
-        }
+        std::string imageDataStr = imageMsg.image_data();
+        QByteArray imageBytes(imageDataStr.c_str(), imageDataStr.size());
+        
+        // 在UI显示图像
+        QPixmap mmp;
+        mmp.loadFromData(imageBytes, "jpg");
+        mmp = mmp.scaled(ui->picture->size());
+        ui->picture->setPixmap(mmp);
+        
+        // 转换为OpenCV Mat进行识别
+        std::vector<uchar> decode(imageBytes.begin(), imageBytes.end());
+        cv::Mat faceImage = cv::imdecode(decode, cv::IMREAD_COLOR);
+        
+        qDebug() << "Received protobuf image data, size:" << imageBytes.size();
+        
+        // 触发人脸识别
+        emit query(faceImage);
     } else {
         // 使用原有的图像数据协议（向后兼容）
         QPixmap mmp;
@@ -135,12 +133,10 @@ void Face_ServerWin::recv_faceid(int64_t faceid)
 {
     qDebug()<<"识别到的人脸id:"<<faceid;
     
-    DoorLockMessage responseMessage;
-    
     if(faceid < 0) {
-        // 识别失败 - 发送Protobuf响应
-        responseMessage = ProtobufHelper::createRecognitionResult(RecognitionResult::FAILED);
-        QByteArray responseData = ProtobufHelper::serializeMessage(responseMessage);
+        // 识别失败 - 发送Protobuf响应（精简版）
+        ResultMessage result = ProtobufHelper::createResultMessage(false);
+        QByteArray responseData = ProtobufHelper::serializeResultMessage(result);
         msocket->write(responseData);
         
         // 向后兼容 - 同时发送JSON响应
@@ -163,9 +159,9 @@ void Face_ServerWin::recv_faceid(int64_t faceid)
         QSqlQuery query;
         
         if(!query.exec(insertSql)) {
-            // 数据库错误
-            responseMessage = ProtobufHelper::createRecognitionResult(RecognitionResult::DATABASE_ERROR);
-            QByteArray responseData = ProtobufHelper::serializeMessage(responseMessage);
+            // 数据库错误 - 发送失败响应
+            ResultMessage result = ProtobufHelper::createResultMessage(false);
+            QByteArray responseData = ProtobufHelper::serializeResultMessage(result);
             msocket->write(responseData);
             
             // 向后兼容
@@ -173,16 +169,15 @@ void Face_ServerWin::recv_faceid(int64_t faceid)
             msocket->write(sdmsg.toUtf8());
             return;
         } else {
-            // 识别成功 - 发送Protobuf响应
-            responseMessage = ProtobufHelper::createRecognitionResult(
-                RecognitionResult::SUCCESS,
+            // 识别成功 - 发送Protobuf响应（精简版）
+            ResultMessage result = ProtobufHelper::createResultMessage(
+                true,
                 record.value("personnelID").toString(),
                 record.value("name").toString(),
                 "软件",
-                0.85f,
-                faceid
+                QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
             );
-            QByteArray responseData = ProtobufHelper::serializeMessage(responseMessage);
+            QByteArray responseData = ProtobufHelper::serializeResultMessage(result);
             msocket->write(responseData);
             
             // 向后兼容 - 同时发送JSON响应

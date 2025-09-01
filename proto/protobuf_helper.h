@@ -2,49 +2,32 @@
 #define PROTOBUF_HELPER_H
 
 #include <QByteArray>
-#include <QString>
-#include <QDateTime>
-#include <opencv.hpp>
-#include "../proto/door_lock_messages.pb.h"
+#include <QDataStream>
+#include <opencv2/opencv.hpp>
+#include "door_lock_messages.pb.h"
 
 using namespace door_lock;
 
 class ProtobufHelper
 {
 public:
-    // 创建图像数据消息
-    static DoorLockMessage createImageMessage(const cv::Mat& image, const QString& deviceId = "door_001");
+    // 创建图像消息
+    static ImageMessage createImageMessage(const cv::Mat& image);
     
     // 创建识别结果消息
-    static DoorLockMessage createRecognitionResult(
-        RecognitionResult::Status status,
-        const QString& personnelId = "",
-        const QString& name = "",
-        const QString& department = "",
-        float confidence = 0.0f,
-        int64_t faceId = -1
-    );
+    static ResultMessage createResultMessage(bool success, 
+                                           const QString& personnelId = "",
+                                           const QString& name = "",
+                                           const QString& department = "",
+                                           const QString& timestamp = "");
     
-    // 创建控制命令消息
-    static DoorLockMessage createControlCommand(
-        ControlCommand::CommandType type,
-        const QString& payload = ""
-    );
+    // 序列化消息
+    static QByteArray serializeImageMessage(const ImageMessage& message);
+    static QByteArray serializeResultMessage(const ResultMessage& message);
     
-    // 序列化消息到QByteArray
-    static QByteArray serializeMessage(const DoorLockMessage& message);
-    
-    // 从QByteArray反序列化消息
-    static bool deserializeMessage(const QByteArray& data, DoorLockMessage& message);
-    
-    // 辅助函数：cv::Mat转换为字节数组
-    static QByteArray matToByteArray(const cv::Mat& mat, const QString& format = "jpg");
-    
-    // 辅助函数：字节数组转换为cv::Mat
-    static cv::Mat byteArrayToMat(const QByteArray& data);
-    
-private:
-    ProtobufHelper() = default;
+    // 反序列化消息
+    static bool deserializeImageMessage(const QByteArray& data, ImageMessage& message);
+    static bool deserializeResultMessage(const QByteArray& data, ResultMessage& message);
 };
 
 #endif // PROTOBUF_HELPER_H
