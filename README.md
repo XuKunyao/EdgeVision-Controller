@@ -1,4 +1,4 @@
-# IntelligentDoorLockSystem_BasedOn_ARM-AI
+# EdgeVision-Controller
 基于韦东山Imx6ull-pro开发板和OpenCV4.5.2和SeetaFace2
 **技术栈：Linux设备驱动、Platform总线、TCP数据(socket)、OpenCV使用、人脸识别算法应用、多线程、QT设计**
 
